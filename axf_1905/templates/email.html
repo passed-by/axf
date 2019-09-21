@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+
+{% block jscss %}
+
+
+    <link rel="stylesheet" href="/static/axf/user/css/user.css">
+
+{% endblock %}
+
+
+
+{% block main %}
+
+
+<div class="container" style="padding-top: 70px">
+    <form method="post" action="">
+
+
+
+        <p></p>
+
+            {% if user.email == '' %}
+            
+
+            <div class="form-group">
+                <label for="username_input">email</label>
+                <input name="email" type="text" class="form-control" id="email" placeholder="邮箱">
+            </div>
+            <input type="hidden" name="type" value="1">
+            <button type="submit" class="btn btn-success btn-block">保存</button>
+
+            {% elif user.is_active == 0 %}
+
+            <div class="form-group">
+                <label for="username_input">email</label>
+                <input name="email_active" type="text" class="form-control" id="email" value="{{ user.email }}">
+            </div>
+            <input type="hidden" name="type" value="2">
+            <button type="submit" class="btn btn-success btn-block">请点击激活</button>
+
+            {% else %}
+
+            <div class="form-group">
+                <label for="username_input">email</label>
+                <input name="email" type="text" class="form-control" id="email" value="admin@admin.com" disabled />
+            </div>
+            <button class="btn btn-success btn-block" disabled>已激活</button>
+
+            {% endif %}
+
+    {% csrf_token %}
+    </form>
+</div>
+{% endblock %}
+

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+
+{% block jscss %}
+
+
+    <link rel="stylesheet" href="/static/axf/order/css/order.css">
+    <link rel="stylesheet" href="/static/axf/order/css/order_detail.css">
+
+
+{% endblock %}
+
+
+
+{% block main %}
+
+
+    <div id="order_detail" class="container" style="padding-top: 70px">
+
+        <h6>订单编号:{{ order_code }}</h6>
+
+        <ul>
+                
+            {% for data in datas %}
+            
+
+            
+                <li class="menuList">
+
+                    <a href="#">
+                        <img src="{{ data.img }}" alt="">
+                        <p>{{ data.name }}</p>
+                        <p class="presentPrice">{{ data.price }}</p>
+                    </a>
+
+
+                    <section>
+                        <span>{{ data.count }}</span>
+                    </section>
+
+                </li>
+
+            {% endfor %}
+
+
+        </ul>
+
+        <h6 class="total_price">总价：<span id="total_price">{{ totalamount }}</span></h6>
+
+        <button orderid="" id="alipay" class="btn btn-success btn-block"><a href="{% url 'orders:pay' order_code %}" style="display: block;">支付</a></button>
+
+    </div>
+
+{% endblock %}
+
+
+

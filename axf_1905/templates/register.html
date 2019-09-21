@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+
+
+{% block jscss %}
+
+
+    <script type="text/javascript" src="/static/js/md5.js"></script>
+    <link rel="stylesheet" href="/static/axf/user/css/register.css">
+
+    <style>
+    .res-error{
+        color: red;
+    }
+    </style>
+    
+{% endblock %}
+
+
+
+{% block main %}
+
+
+    <div class="container"  style="padding-top: 70px">
+        <form method="post" enctype="multipart/form-data" action="">
+
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username_input">用户名</label>
+                <input name="username" type="text" class="form-control" id="username_input" placeholder="请输入用户名">
+                <span id="username_info" class="res-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="password_input">密码</label>
+                <input name="password" type="password" class="form-control" id="password_input" placeholder="请输入密码">
+                <span id="password_info" class="res-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="password_confirm_input">确认密码</label>
+                <input name="password_confirm" type="password" class="form-control" id="password_confirm_input" placeholder="请再次输入密码">
+                <span id="password_confirm_info" class="res-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="icon_input">头像</label>
+                <input name="avatar" type="file" id="icon_input">
+            </div>
+            <div class="form-group">
+                <label for="email_input">手机号</label>
+                <input name="phone" type="text" class="form-control" id="phone_input" placeholder="请输入手机号">
+                <span id="phone_info" class="res-error"></span>
+            </div>
+            <div class="form-group">
+
+                <label for="email_input" style="float: left">短信验证码</label>
+
+                <div class="clear"></div>
+
+                <input name="smscode" type="text" class="form-control"id="smscode" placeholder="请输入验证码">
+
+                <input type="button" value="发送验证码" id="sendsms">
+
+                <span id="smscode_info" class="res-error"></span>
+            </div>
+
+            <div class="clear lastdiv"></div>
+            
+            <button type="submit" class="btn btn-success btn-block">注册</button>
+        </form>
+    </div>
+
+
+
+    <script>
+
+    $(function(){
+
+        $('#sendsms').click(function(){
+
+            {#1, 判断手机号是否为空#}
+            var phone = $('#phone_input').val()
+            if(phone.trim()==''){
+                $('#phone_info').html('手机号不能为空')
+                return
+            }
+
+            {#2, 判断手机号的格式#}
+            var re = /^1[3456789]\d{9}$/
+            if(!re.test(phone)){
+                $('#phone_info').html('手机号格式错误')
+                return
+            }
+
+            {#3,通过验证，清除效果#}
+            $('#phone_info').html('')
+
+            {#点击之后把按钮的点击效果去掉#}
+            $(this).prop('disabled', true)
+
+
+            var num = 59
+            $(this).val(num+'秒')
+
+            var t = setInterval(()=>{
+
+                num -= 1
+
+                {#给按钮赋值倒数的秒数#}
+                $(this).val(num+'秒')
+
+                if(num==0){
+
+                    {#清除定时器效果#}
+                    clearInterval(t)
+
+                    {#恢复按钮的点击效果#}
+                    $(this).prop('disabled', false)
+                    $(this).val('发送验证码')
+                }
+
+            }, 1000)
+
+
+            {#发送短信#}
+            $.ajax({
+                url: '{% url "users:sendsms" %}',
+                type: 'post',
+                data: {'phone': phone},
+                dataType: 'json',
+                headers: {'X-CSRFToken': "{{ csrf_token }}"},
+                success:function(data){
+                    if(data.res=='yes'){
+                        console.log('success')
+                    }else{
+                        console.log('fail')
+                    }
+                }
+            })
+
+        })
+
+
+
+    })
+    </script>
+
+{% endblock %}

@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% block jscss %}
+
+    <link rel="stylesheet" href="/static/axf/main/css/cart.css">
+
+{% endblock %}
+
+
+{% block main %}
+
+<div id="cart">
+    <h3>Cart</h3>
+    <div class="full">
+        <section>
+            <ul>
+                <li>收&nbsp;&nbsp;货&nbsp;&nbsp;人:&nbsp;Rock</li>
+                <li>电&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;话:&nbsp;110</li>
+                <li>地&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;址:&nbsp;宝盛里</li>
+            </ul>
+
+            <div class="bill">
+
+                <p>闪送超市</p>
+                <p>0元起送满30免运费22:00前可送达</p>
+                <a href="#">凑单专区</a>
+
+            </div>
+
+            <div class="delivery">
+                <span>收货时间</span>
+                <span>一小时内送达</span>
+                <a href="#">可预订&gt;</a>
+            </div>
+
+            <div class="delivery">
+                <span>收获备注</span>
+                <input type="text" placeholder="可输入100字以内的特殊要求">
+            </div>
+
+            <ul>
+
+                {% for data in data_list %}
+
+                <li class="menuList" cartid="">
+                    <div class="confirm">
+                        {% if data.selected == '1' %}
+                            <input type="checkbox" checked class="select_check"  goodsid="{{ data.id }}"/>
+                        {% else %}
+                            <input type="checkbox"  class="select_check"  goodsid="{{ data.id }}"/>
+                        {% endif %}
+                    </div>
+
+                    <a href="#">
+                        <img src="{{ data.img }}" alt="">
+                        <p>{{ data.name }}</p>
+                        <p class="">¥<span class="cartPrice">{{ data.price }}</span></p>
+                    </a>
+
+                    <section>
+                        <button class="subShopping" goodsid="{{ data.id }}">-</button>
+                        <span class="cartCount">{{ data.num }}</span>
+                        <button class="addShopping" goodsid="{{ data.id }}">+</button>
+                    </section>
+
+                </li>
+
+                {% endfor %}
+
+            </ul>
+
+            {% if data_list %}
+            <div class="payTheBill">
+                <div class="all_select">
+                    <input type="checkbox" checked class="select_all_check"/>    
+                </div>
+
+                <p>
+                    <span>全选</span>
+                    <span>共计:</span>
+                    <span id="total_price">{{ totalprice }}</span>
+                </p>
+
+                <span id="make_order"><a href="{% url 'orders:index' %}" id="add_order">下单</a></span>
+            </div>
+            {% endif %}
+
+        </section>
+
+
+    </div>
+</div>
+
+
+
+    <script>
+
+    {#计算总价#}
+    function cacl(){
+
+        {# 遍历所有的商品，把选中的商品的总价相加#}
+        var totalprice = 0
+        {# 1，遍历所有商品#}
+        $('.menuList').each(function(){
+
+            {#2,找到选中的商品#}
+            if($(this).find('.select_check').prop("checked")){
+                var price = parseFloat($(this).find('.cartPrice').text())
+                var count = parseInt($(this).find('.cartCount').text())
+                totalprice += price * count
+            }
+
+        })
+
+        $('#total_price').text(totalprice.toFixed(2))
+
+    }
+
+    {#改变全选的状态#}
+    {#先默认全部是是选中状态，遍历所有的复选框，如果有一个没选中，那么全选不选中#}
+    function show(){
+
+        var flag = true
+
+        $('.select_check').each(function () {
+             if(!$(this).prop("checked")){
+                 flag = false
+                 return {# 跳出循环 #}
+             }
+        })
+
+        if(flag){
+            $('.select_all_check').prop('checked', true)
+        }else{
+            $('.select_all_check').prop('checked', false)
+        }
+
+    }
+    
+
+
+    $(function(){
+
+        show()
+
+        {#增加商品#}
+        $('.addShopping').click(function(){
+            {#1， 商品数量加1#}
+            {#找出数量的值，是一个字符串，要转成整型#}
+            var num = parseInt($(this).siblings('span').text())
+            num += 1
+
+            {#把数量赋值到span标签里面#}
+            $(this).siblings('span').text(num)
+
+
+            {#获取商品id和数量#}
+            var gid = $(this).attr('goodsid')
+            var count = num
+
+
+            {#计算总价#}
+            cacl()
+
+            {#同过ajax来操作后端的功能#}
+            $.ajax({
+                url: '{% url "market:savedata" %}',
+                type: 'post',
+                data: {'gid': gid, 'count': count},
+                dataType: 'json',
+                headers: {'X-CSRFToken': "{{ csrf_token }}"},
+                success:function(data){
+
+                }
+            })
+
+
+        })
+
+
+
+        {#减商品#}
+        $('.subShopping').click(function(){
+
+
+            {#1， 商品数量加1#}
+            {#找出数量的值，是一个字符串，要转成整型#}
+            var num = parseInt($(this).siblings('span').text())
+
+            num -= 1
+
+            if(num == 0){
+                {#0 当商品的数量为0，那么移除改商品#}
+                $(this).parent().parent().remove()
+            }
+
+            {#把数量赋值到span标签里面#}
+            $(this).siblings('span').text(num)
+
+
+            {#获取商品id和数量#}
+            var gid = $(this).attr('goodsid')
+            var count = num
+
+
+            {#计算总价#}
+            cacl()
+
+            
+            {#通过ajax来操作后端的功能#}
+            $.ajax({
+                url: '{% url "market:savedata" %}',
+                type: 'post',
+                data: {'gid': gid, 'count': count},
+                dataType: 'json',
+                headers: {'X-CSRFToken': "{{ csrf_token }}"},
+                success:function(data){
+
+                }
+            })
+
+
+        })
+
+
+        $('.select_check').click(function(){
+
+
+            {# 传递的参数，一个是选中状态，一个是商品id, 一个是商品数量#}
+            var gid = $(this).attr('goodsid')
+            var count = $(this).parent().parent().find('.cartCount').text()
+            var selected = $(this).prop("checked") ? '1' : '0'
+
+
+            {#计算总价#}
+            cacl()
+
+            {#改变全选复选框的状态#}
+            show()
+
+
+            {#通过ajax来操作后端的功能#}
+            $.ajax({
+                url: '{% url "market:savedata" %}',
+                type: 'post',
+                data: {'gid': gid, 'count': count, 'selected': selected},
+                dataType: 'json',
+                headers: {'X-CSRFToken': "{{ csrf_token }}"},
+                success:function(data){
+
+                }
+            })
+
+        })
+
+
+
+
+        $('.select_all_check').click(function(){
+
+            {#1,让所有复选框不选中#}
+            $('.select_check').prop('checked', $(this).prop("checked"))
+
+            var selected = $(this).prop('checked') ? '1' : '0'
+
+            {#计算总价#}
+            cacl()
+
+
+            {#2，更改cookie的selected的状态#}
+            $.ajax({
+                url: '{% url "carts:selects" %}',
+                type: 'post',
+                data: {'selected': selected},
+                dataType: 'json',
+                headers: {'X-CSRFToken': "{{ csrf_token }}"},
+                success:function(data){
+
+                }
+            })
+            
+        })
+
+
+
+        $('#add_order').click(function(){
+
+            {## 判断所有的复选框都不选中#}
+            var flag = false
+
+            $('.select_check').each(function () {
+                 if($(this).prop("checked")){
+                     flag = true
+                     return {# 跳出循环 #}
+                 }
+            })
+
+            if(!flag){
+                {#禁止a标签跳转#}
+                return false
+            }
+
+        })
+
+
+    })
+    </script>
+
+{% endblock %}
+
+

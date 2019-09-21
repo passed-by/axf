@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+
+
+{% block jscss %}
+
+
+    <link rel="stylesheet" href="/static/axf/main/css/market.css">
+
+    <script type="text/javascript" src="/static/js/swiper.jquery.js"></script>
+    <script type="text/javascript" src="/static/axf/main/js/market.js"></script>
+
+{% endblock %}
+
+
+{% block main %}
+
+<div id="market">
+
+    <aside>
+        <ul>
+
+            {% for ft in foodtype %}
+            <li>
+                <a href="{% url 'market:index' ft.typeid 0 0 %}">{{ ft.typename }}</a>
+
+                {% if cid == ft.typeid %}
+                <span class="yellowSlide"></span>
+                {% endif %}
+
+
+            </li>
+            {% endfor %}
+
+
+
+
+        </ul>
+    </aside>
+
+
+    <section>
+        <nav>
+            <ul>
+                <li id="all_types"><span>全部分类 <span class="glyphicon glyphicon-chevron-down"></span></span></li>
+                <li id="sort_rule"><span>综合排序 <span class="glyphicon glyphicon-chevron-down"></span></span></li>
+            </ul>
+        </nav>
+
+        <menu>
+            <ul>
+
+                {% for good in goods %}
+
+                <li>
+                    <a href="#">
+                        <img src="{{ good.productimg }}" alt="">
+                        <div class="shoppingInfo">
+                            <h6>{{ good.productlongname }}</h6>
+                            <p class="detailTag">
+                            </p>
+                            <p class="unit">{{ good.specifics }}</p>
+                            <p class="price">
+                                <span>{{ good.price }}</span>
+                                <s>{{ good.marketprice }}</s>
+                            </p>
+                        </div>
+                    </a>
+
+                    <section>
+                        <button goodsid="{{ good.id }}" class="subShopping">－</button>
+                        <span>0</span>
+                        <button goodsid="{{ good.id }}" class="addShopping">＋</button>
+                    </section>
+                </li>
+
+                {% endfor %}
+
+
+            </ul>
+            <div id="all_types_container">
+                <div>
+
+                    {% for k,v in childcatetwo.items %}
+                    <a href="{% url 'market:index' cid k 0 %}">
+                        {% if twoid == k %}
+                            <button class="btn btn-success">{{ v }}</button>
+                        {% else %}
+                            <button class="btn btn-default">{{ v }}</button>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+
+
+
+                </div>
+            </div>
+
+            <div id="sort_rule_container">
+                <div>
+
+                    {% for orders in order_data %}
+                     <a href="{% url 'market:index' cid twoid orders.1 %}">
+                        {% if sortid == orders.1 %}
+                            <button class="btn btn-success">{{ orders.0 }}</button>
+                        {% else %}
+                            <button class="btn btn-default">{{ orders.0 }}</button>
+                        {% endif %}
+                     </a>
+                    {% endfor %}
+
+
+                </div>
+            </div>
+        </menu>
+
+    </section>
+
+
+</div>
+
+
+
+    <script>
+
+
+    $(function(){
+
+
+        {#增加商品#}
+        $('.addShopping').click(function(){
+            {#1， 商品数量加1#}
+            {#找出数量的值，是一个字符串，要转成整型#}
+            var num = parseInt($(this).siblings('span').text())
+            num += 1
+
+            {#把数量赋值到span标签里面#}
+            $(this).siblings('span').text(num)
+
+
+            {#获取商品id和数量#}
+            var gid = $(this).attr('goodsid')
+            var count = num
+
+            {#同过ajax来操作后端的功能#}
+            $.ajax({
+                url: '{% url "market:savedata" %}',
+                type: 'post',
+                data: {'gid': gid, 'count': count},
+                dataType: 'json',
+                headers: {'X-CSRFToken': "{{ csrf_token }}"},
+                success:function(data){
+
+                }
+            })
+
+
+        })
+
+
+
+        {#减商品#}
+        $('.subShopping').click(function(){
+            {#1， 商品数量加1#}
+            {#找出数量的值，是一个字符串，要转成整型#}
+            var num = parseInt($(this).siblings('span').text())
+
+            if(num == 0){
+                return
+            }
+
+            num -= 1
+
+            {#把数量赋值到span标签里面#}
+            $(this).siblings('span').text(num)
+
+
+            {#获取商品id和数量#}
+            var gid = $(this).attr('goodsid')
+            var count = num
+
+            {#通过ajax来操作后端的功能#}
+            $.ajax({
+                url: '{% url "market:savedata" %}',
+                type: 'post',
+                data: {'gid': gid, 'count': count},
+                dataType: 'json',
+                headers: {'X-CSRFToken': "{{ csrf_token }}"},
+                success:function(data){
+
+                }
+            })
+
+
+        })
+
+
+    })
+    </script>
+
+{% endblock %}
+
+
+{% comment %}
+当点击商品的+号，需要做两个操作
+1。 显示的商品数量+1
+2。 把商品的id，购买的数量，商品默认的选中状态保存在cookie里面
+{ '商品的id':{'count':'购买的数量', 'selected':'商品的选中状态'} }
+{% endcomment %}

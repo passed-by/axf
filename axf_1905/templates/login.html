@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+
+
+{% block jscss %}
+
+
+    <script type="text/javascript" src="/static/js/md5.js"></script>
+
+    <link rel="stylesheet" href="/static/axf/user/css/user.css">
+
+    <script type="text/javascript" src="/static/axf/user/js/login.js"></script>
+
+{% endblock %}
+
+
+
+
+{% block main %}
+
+
+<div class="container" style="padding-top: 70px">
+    <form method="post" action="">
+
+        <p></p>
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username_input">用户名</label>
+            <input name="username" type="text" class="form-control" id="username_input" placeholder="用户名/邮箱">
+        </div>
+
+        <div class="form-group">
+            <label for="password_input">密码</label>
+            <input name="password" type="password" class="form-control" id="password_input" placeholder="请输入密码">
+        </div>
+
+
+        <button type="submit" class="btn btn-success btn-block">登录</button>
+    </form>
+
+    <div><a href="{% url "users:register" %}">注册</a></div>
+</div>
+
+{% endblock %}
+
+

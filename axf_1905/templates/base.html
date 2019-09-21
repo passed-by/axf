@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title></title>
+
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/swiper.css">
+    <link rel="stylesheet" href="/static/css/reset.css">
+    <link rel="stylesheet" href="/static/axf/main/css/main.css">
+    <script type="text/javascript" src="/static/js/jquery.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap.js"></script>
+    <script type="text/javascript" src="/static/js/base.js"></script>
+
+
+
+
+    {% block jscss %}
+
+    {% endblock %}
+
+</head>
+
+
+<body>
+
+<header></header>
+
+
+
+{% block main %}
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+<footer>
+    <a href="{% url "contents:index" %}" class="home">
+        <dl>
+            <dt>
+                <span></span>
+            </dt>
+            <dd>首页</dd>
+        </dl>
+    </a>
+    <a href="{% url 'market:index' 0 0 0 %}" class="market">
+        <dl>
+            <dt>
+                <span></span>
+            </dt>
+            <dd>闪购</dd>
+        </dl>
+    </a>
+    <a href="{% url "carts:index" %}" class="cart">
+        <dl>
+            <dt>
+                <span></span>
+            </dt>
+            <dd>购物车</dd>
+        </dl>
+    </a>
+    <a href="{% url 'users:info' %}" class="mine_icon">
+        <dl>
+            <dt>
+                <span></span>
+            </dt>
+            <dd>我的</dd>
+        </dl>
+    </a>
+</footer>
+
+
+
+
+
+</body>
+</html>

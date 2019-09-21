@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+
+
+{% block jscss %}
+
+
+    <link rel="stylesheet" href="/static/axf/order/css/order.css">
+    <link rel="stylesheet" href="/static/axf/order/css/order_list_not_pay.css">
+{% endblock %}
+
+
+{% block main %}
+
+<div id="order_list_not_pay" class="container" style="padding-top: 70px">
+
+    <ol>
+
+        {% for order_code, data_dict in data_dicts.items %}
+        
+
+        
+        <li>
+            <ul class="order" orderid="1111">
+                <h6><a href="{% url 'orders:orderpay' order_code %}">订单编号:{{ order_code }}</a></h6>
+
+                {% for data in data_dict %}
+                <li class="menuList">
+                    <a href="#">
+                        <img src="{{ data.img }}" alt="">
+                        <p>{{ data.name }}</p>
+                        <p class="presentPrice">{{ data.price }}</p>
+                    </a>
+
+
+                    <section>
+                        <span>{{ data.count }}</span>
+                    </section>
+
+                </li>
+                {% endfor %}
+
+
+            </ul>
+
+        </li>
+
+        {% endfor %}
+
+        
+
+
+    </ol>
+
+
+</div>
+{% endblock %}
